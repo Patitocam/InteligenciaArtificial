@@ -9,9 +9,9 @@ public class IdleStateEnemy: EnemyStates
     {
         this.sm = sm;
     }
-    public override void Tick()
+    public override void Tick(float deltaTime)
     {
-        base.Tick();
+        base.Tick(deltaTime);
         Idle();
     }
     private void Idle()

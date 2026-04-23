@@ -14,9 +14,9 @@ public class PatrolStateEnemy: EnemyStates
     {
         this.sm = sm;
     }
-    public override void Tick()
+    public override void Tick(float deltaTime)
     {
-        base.Tick();
+        base.Tick(deltaTime);
         Patrol();
     }
     private void Patrol()

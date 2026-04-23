@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 public interface IState
 {
     void Enter();
-    void Tick();
+    void Tick(float deltaTime);
     void Exit();
 
 }

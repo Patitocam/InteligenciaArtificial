@@ -7,9 +7,9 @@ public class AttackStateEnemy : EnemyStates
     {
         this.sm = sm;
     }
-    public override void Tick()
+    public override void Tick(float deltaTime)
     {
-        base.Tick();
+        base.Tick(deltaTime);
         Attack();
     }
     private void Attack()

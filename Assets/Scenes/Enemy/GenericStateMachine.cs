@@ -19,9 +19,9 @@ public class GenericStateMachine<T>
         states.Add(stateValue, state);
     }
 
-    public void Update()
+    public void Update(float deltaTime)
     {
-        currentState.Tick();
+        currentState.Tick(deltaTime);
     }
 
     public void ChangeState(T newState)

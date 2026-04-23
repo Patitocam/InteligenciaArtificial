@@ -10,6 +10,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float viewAngle;
     [SerializeField] private float viewLenght;
     [SerializeField] private LayerMask wallsAndObs;
+    [SerializeField] public Rigidbody Rb;
 
     private EnemySM enemySm;
 
@@ -17,27 +18,29 @@ public class EnemyController : MonoBehaviour
     ActionNode seeing;
     ActionNode notSeeing;
     QuestionNode seeQuestion;
+    Rigidbody playerRb;
 
     void Start()
     {
         LOS = new LineOfSight(Target, viewAngle, viewLenght, wallsAndObs, this.transform);
         seeing = new ActionNode(SeeingPlayer);
         notSeeing = new ActionNode(NotSeeingPlayer);
-        seeQuestion = new QuestionNode(IsSeeng, seeing, notSeeing);
+        seeQuestion = new QuestionNode(IsSeeing, seeing, notSeeing);
         root = seeQuestion;
-        enemySm = new EnemySM(Target);
+        playerRb = Target.GetComponent<Rigidbody>();
+        enemySm = new EnemySM(Target, playerRb, this);
     }
 
     void Update()
     {
         root.Execute();
-        enemySm.Tick();
+        enemySm.Tick(Time.deltaTime);
     }
 
-    private bool IsSeeng() => LOS.Sight();
+    private bool IsSeeing() => LOS.Sight();
     void SeeingPlayer()
     {
-        enemySm.SwitchState(EnemyStatesEnum.Patrolling);
+        enemySm.SwitchState(EnemyStatesEnum.Chasing);
     }
     void NotSeeingPlayer()
     {

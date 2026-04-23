@@ -10,9 +10,9 @@ namespace Assets.Scenes.Enemy
         {
             this.sm = sm;
         }
-        public override void Tick()
+        public override void Tick(float deltaTime)
         {
-            base.Tick();
+            base.Tick(deltaTime);
             RunAway();
         }
         private void RunAway()

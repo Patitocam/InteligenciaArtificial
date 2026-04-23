@@ -20,7 +20,7 @@ public class State<T> : IState
     {
 
     }
-    public virtual void Tick()
+    public virtual void Tick(float deltaTime)
     {
 
     }
