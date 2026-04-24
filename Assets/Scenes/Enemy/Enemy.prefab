@@ -333,7 +333,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Target: {fileID: 0}
   viewAngle: 360
-  viewLenght: 100
+  viewLenght: 15
   wallsAndObs:
     serializedVersion: 2
     m_Bits: 16
