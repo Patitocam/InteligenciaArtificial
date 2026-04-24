@@ -7,12 +7,13 @@ public enum EnemyStatesEnum
     Patrolling,
     Chasing,
     RunAway,
-    Attack
+    Attack,
+    Arrive
 }
 
 public class EnemySM 
 {
-    private GenericStateMachine<EnemyStatesEnum> fsm;
+    public GenericStateMachine<EnemyStatesEnum> fsm;
 
     public EnemySM(GameObject Target, Rigidbody rb, EnemyController owner)
     {
@@ -23,6 +24,7 @@ public class EnemySM
         fsm.AddState(new RunAwayStateEnemy(this, fsm, Target), EnemyStatesEnum.RunAway);
         fsm.AddState(new ChaseStateEnemy(this, fsm, Target, rb, owner), EnemyStatesEnum.Chasing);
         fsm.AddState(new AttackStateEnemy(this, fsm, Target), EnemyStatesEnum.Attack);
+        fsm.AddState(new ArriveStateEnemy(this, fsm, Target, rb, owner), EnemyStatesEnum.Arrive);
         fsm.SetCurrent(idle);
     }
 

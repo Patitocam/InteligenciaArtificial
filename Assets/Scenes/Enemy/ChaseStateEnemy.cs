@@ -19,18 +19,35 @@ public class ChaseStateEnemy : EnemyStates
     public override void Tick(float deltaTime)
     {
         base.Tick(deltaTime);
-        Chase(deltaTime);
+        Move(deltaTime);
     }
-    private void Chase(float deltaTime)
+
+    private void Move(float deltaTime)
+    { 
+        owner.transform.Translate(Chase() * speed * deltaTime, Space.World);
+        owner.transform.LookAt(Chase());
+    }
+    private Vector3 Chase()
     {
-        /*Vector3 currentSpeed;
-        var future_position = target.transform.position + playerRB.Speed * timePrediction;
+        Vector3 toTarget = target.transform.position - owner.transform.position;
+        float distance = toTarget.magnitude;
 
-        var desired_velocity = (future_position - transform.position).NoY().normalized * max_speed;
-        var steering = desired_velocity - currentSpeed;
+        Vector3 targetDir = playerRB.velocity.normalized;
 
-        currentSpeed += steering * deltaTime;
-        owner.transform.position += currentSpeed * deltaTime;*/
+        float movingAway = Vector3.Dot(toTarget.normalized, targetDir);
+
+        float predictor = 0;
+
+        if (movingAway > 0)
+        {
+            predictor = Mathf.Clamp(distance / speed, 0f, 1f);
+        }
+
+        Vector3 futurePosition = target.transform.position + playerRB.velocity * predictor;
+
+        Vector3 desiredDir = (futurePosition - owner.transform.position).normalized;
+
+        return desiredDir;
     }
 
 }
