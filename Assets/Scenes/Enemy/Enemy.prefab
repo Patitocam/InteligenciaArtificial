@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4853748009658674766}
   - component: {fileID: 8326794702796371855}
   - component: {fileID: 2729051207331252214}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -117,7 +117,7 @@ GameObject:
   - component: {fileID: 6581545445319096473}
   - component: {fileID: 2508151216498290360}
   - component: {fileID: 8584518591521204512}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -224,7 +224,7 @@ GameObject:
   - component: {fileID: 2188384753300155559}
   - component: {fileID: 6185878262208383397}
   - component: {fileID: 871619400820985891}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -337,7 +337,13 @@ MonoBehaviour:
   wallsAndObs:
     serializedVersion: 2
     m_Bits: 16
+  obs:
+    serializedVersion: 2
+    m_Bits: 32
   Rb: {fileID: 871619400820985891}
+  arriveDistance: 7
+  attackRange: 2
+  speed: 7
 --- !u!54 &871619400820985891
 Rigidbody:
   m_ObjectHideFlags: 0
