@@ -9,12 +9,12 @@ using UnityEngine;
 public class PatrolStateEnemy: EnemyStates
 {
     private EnemySM sm;
-    EnemyController owner;
+    EntityController owner;
     float speed;
     Transform[] wayPoints;
     int currentWaypoint;
 
-    public PatrolStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, EnemyController owner, float speed, Transform[] wayPoints) : base(stateMachine) 
+    public PatrolStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, EntityController owner, float speed, Transform[] wayPoints) : base(stateMachine) 
     {
         this.sm = sm;
         this.owner = owner;
@@ -25,22 +25,27 @@ public class PatrolStateEnemy: EnemyStates
     public override void Tick(float deltaTime)
     {
         base.Tick(deltaTime);
-        Patrol();
+        Move();
     }
-    private void Patrol()
+    public void Move()
     {
-        if (wayPoints.Length == 0) return;
+        owner.Move(Patrol(), speed);
+    }
+    private Vector3 Patrol()
+    {
+        if (wayPoints.Length == 0) return Vector3.zero;
 
         Transform target = wayPoints[currentWaypoint];
 
         Vector3 direction = (target.position - owner.transform.position).normalized;
-        owner.Move(direction, speed);
+        
         owner.transform.LookAt(target.position);
 
         if ((target.position - owner.transform.position).magnitude < 1f)
         {
             currentWaypoint = (currentWaypoint + 1) % wayPoints.Length;
         }
+        return direction;
     }
 }
 

@@ -8,10 +8,11 @@ namespace Assets.Scenes.Enemy
     {
         private EnemySM sm;
         GameObject target;
-        EnemyController owner;
+        EntityController owner;
         float speed;
+        float speedUpDistance = 10;
 
-        public RunAwayStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, GameObject Target, EnemyController owner, float speed) : base(stateMachine)
+        public RunAwayStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, GameObject Target, EntityController owner, float speed) : base(stateMachine)
         {
             this.sm = sm;
             this.target = Target;
@@ -26,18 +27,20 @@ namespace Assets.Scenes.Enemy
 
         private void Move()
         {
-            owner.Move(RunAway(), speed);
-            owner.transform.LookAt(target.transform.position);
+            var dir = RunAway();
+            owner.Move(dir.Item1, dir.Item2);
+            owner.transform.LookAt(owner.transform.position + dir.Item1);
         }
 
-        private Vector3 RunAway()
+        private (Vector3, float) RunAway()
         {
             Vector3 toTarget = target.transform.position - owner.transform.position;
             float distance = toTarget.magnitude;
+            float speedT = speed + 2 * (speedUpDistance / distance);
 
-            Vector3 desiredDir = ((toTarget - owner.transform.position).normalized) * -1;
+            Vector3 desiredDir = ((toTarget).normalized) * -1;
 
-            return desiredDir;
+            return (desiredDir, speedT);
         }
     }
 }

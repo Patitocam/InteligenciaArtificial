@@ -4,12 +4,12 @@ public class ArriveStateEnemy: EnemyStates
 {
     private EnemySM sm;
     private GameObject target;
-    private EnemyController owner;
+    private EntityController owner;
     private float speed;
     float arriveDistance;
     float attackRange;
 
-    public ArriveStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, GameObject Target, EnemyController owner, float arriveDistance, float attackRange, float speed) : base(stateMachine)
+    public ArriveStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, GameObject Target, EntityController owner, float arriveDistance, float attackRange, float speed) : base(stateMachine)
     {
         this.sm = sm;
         this.target = Target;
@@ -21,9 +21,15 @@ public class ArriveStateEnemy: EnemyStates
     public override void Tick(float deltaTime)
     {
         base.Tick(deltaTime);
-        Arrive(deltaTime);
+        Move();
     }
-    private void Arrive(float delta)
+
+    public void Move()
+    {
+        var (dir, spd) = Arrive();
+        owner.Move(dir, spd);
+    }
+    private (Vector3, float) Arrive()
     {
         var dir = (target.transform.position - owner.transform.position);
         var distance = dir.magnitude;
@@ -33,8 +39,9 @@ public class ArriveStateEnemy: EnemyStates
         if (distance < arriveDistance) speedT = distance;
         if (distance < attackRange) speedT = 0;
 
-        owner.Move(dir.normalized, speedT);
+        var destiny = dir.normalized;
         owner.transform.LookAt(target.transform.position);
+        return (destiny, speedT);
     }
 }
 

@@ -3,6 +3,7 @@
 public class EnemyMovement
 {
     private Transform owner;
+    private Rigidbody ownerRB;
 
     private float avoidanceRayLength = 2.5f;
     private float avoidanceStrength = 15;
@@ -12,18 +13,21 @@ public class EnemyMovement
     public EnemyMovement(Transform transformOwner, LayerMask obs)
     {
         owner = transformOwner;
+        ownerRB = transformOwner.GetComponent<Rigidbody>();
         obstacleLayer = obs;
     }
 
-    public void Move(Vector3 target, float delta, float speed)
+    public void Move(Vector3 target, float speed, float delta)
     {
         Vector3 finalDir = ApplyObstacleAvoidance(target);
-        owner.Translate(finalDir * delta * speed, Space.World);
+        finalDir.y = 0;
+        Debug.DrawLine(owner.position, owner.position + finalDir, Color.magenta);
+        ownerRB.MovePosition(ownerRB.position + finalDir * speed * delta);
     }
 
     private Vector3 ApplyObstacleAvoidance(Vector3 desiredDirection)
     {
-        Vector3 avoidance = GetAvoidanceForce();
+        Vector3 avoidance = GetAvoidanceForce(desiredDirection);
 
         if (avoidance == Vector3.zero)
             return desiredDirection;
@@ -32,12 +36,12 @@ public class EnemyMovement
         return finalDirection;
     }
 
-    private Vector3 GetAvoidanceForce()
+    private Vector3 GetAvoidanceForce(Vector2 desiredDirection)
     {
         Vector3 avoidance = Vector3.zero;
 
 
-        if (Physics.Raycast(owner.position, owner.forward, out RaycastHit hitCenter, avoidanceRayLength, obstacleLayer))
+        if (Physics.Raycast(owner.position, desiredDirection, out RaycastHit hitCenter, avoidanceRayLength, obstacleLayer))
         {
 
             Vector3 avoid = Vector3.Cross(hitCenter.normal, Vector3.up);
@@ -50,7 +54,7 @@ public class EnemyMovement
         }
 
 
-        Vector3 leftDir = Quaternion.Euler(0, -avoidanceRayAngle, 0) * owner.forward;
+        Vector3 leftDir = Quaternion.Euler(0, -avoidanceRayAngle, 0) * desiredDirection;
         if (Physics.Raycast(owner.position, leftDir, out RaycastHit hitLeft, avoidanceRayLength, obstacleLayer))
         {
             Vector3 avoid = Vector3.Cross(hitLeft.normal, Vector3.up);
@@ -61,7 +65,7 @@ public class EnemyMovement
         }
 
 
-        Vector3 rightDir = Quaternion.Euler(0, avoidanceRayAngle, 0) * owner.forward;
+        Vector3 rightDir = Quaternion.Euler(0, avoidanceRayAngle, 0) * desiredDirection;
         if (Physics.Raycast(owner.position, rightDir, out RaycastHit hitRight, avoidanceRayLength, obstacleLayer))
         {
             Vector3 avoid = Vector3.Cross(hitRight.normal, Vector3.up);

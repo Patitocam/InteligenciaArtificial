@@ -5,11 +5,11 @@ public class ChaseStateEnemy : EnemyStates
 {
     private EnemySM sm;
     private GameObject target;
-    private EnemyController owner;
+    private EntityController owner;
     private Rigidbody playerRB;
     private float speed;
 
-    public ChaseStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, GameObject Target, Rigidbody playerRb, EnemyController owner, float speed) : base(stateMachine)
+    public ChaseStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, GameObject Target, Rigidbody playerRb, EntityController owner, float speed) : base(stateMachine)
     {
         this.sm = sm;
         this.target = Target;
@@ -20,10 +20,10 @@ public class ChaseStateEnemy : EnemyStates
     public override void Tick(float deltaTime)
     {
         base.Tick(deltaTime);
-        Move(deltaTime);
+        Move();
     }
 
-    private void Move(float deltaTime)
+    private void Move()
     {
         owner.Move(Chase(), speed);
         owner.transform.LookAt(target.transform.position);
@@ -33,21 +33,15 @@ public class ChaseStateEnemy : EnemyStates
         Vector3 toTarget = target.transform.position - owner.transform.position;
         float distance = toTarget.magnitude;
 
-        Vector3 targetDir = playerRB.velocity.normalized;
+        Vector3 futurePosition = target.transform.position;
 
-        float movingAway = Vector3.Dot(toTarget.normalized, targetDir);
-
-        float predictor = 0;
-
-        if (movingAway > 0)
+        if (playerRB.velocity.magnitude > 0.001f)
         {
-            predictor = Mathf.Clamp(distance / speed, 0f, 1f);
+            float predictor = Mathf.Clamp(distance / speed, 0f, 1f);
+            futurePosition = target.transform.position + playerRB.velocity * predictor;
         }
 
-        Vector3 futurePosition = target.transform.position + playerRB.velocity * predictor;
-
         Vector3 desiredDir = (futurePosition - owner.transform.position).normalized;
-
         return desiredDir;
     }
 

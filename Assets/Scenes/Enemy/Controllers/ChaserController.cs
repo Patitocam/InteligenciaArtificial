@@ -1,26 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
+using static UnityEditor.PlayerSettings;
+using static UnityEngine.GraphicsBuffer;
 
-public class EnemyController : MonoBehaviour
+public class ChaserController : EntityController
 {
-    private LineOfSight LOS;
+    [SerializeField] protected float arriveDistance;
+    [SerializeField] protected float attackRange;
+    [SerializeField] protected Transform[] wayPoints;
 
-    [SerializeField] private GameObject Target;
-    [SerializeField] private float viewAngle;
-    [SerializeField] private float viewLenght;
-    [SerializeField] private LayerMask wallsAndObs;
-    [SerializeField] private LayerMask obs;
-    [SerializeField] public Rigidbody Rb;
-    [SerializeField] private float arriveDistance;
-    [SerializeField] private float attackRange;
-    [SerializeField] private float speed;
-    [SerializeField] private Transform[] wayPoints;
-
-    private EnemySM enemySm;
-    private EnemyMovement movement;
-
-    private QuestionNode root;
     ActionNode seeingNode;
     ActionNode notSeeingNode;
     ActionNode nearPlayerNode;
@@ -29,12 +18,10 @@ public class EnemyController : MonoBehaviour
     QuestionNode attackQuestionNode;
     QuestionNode closeQuestionNode;
 
-    Rigidbody playerRb;
-
-    void Start()
+    public override void Start()
     {
-        LOS = new LineOfSight(Target, viewAngle, viewLenght, wallsAndObs, this.transform);
-
+        base.Start();
+        enemySm = new EnemySM(Target, playerRb, this, arriveDistance, attackRange, speed, movement, wayPoints);
         seeingNode = new ActionNode(SeeingPlayer);
         notSeeingNode = new ActionNode(NotSeeingPlayer);
         nearPlayerNode = new ActionNode(InRange);
@@ -44,17 +31,6 @@ public class EnemyController : MonoBehaviour
         closeQuestionNode = new QuestionNode(IsClose, attackQuestionNode, seeingNode);
         seeQuestionNode = new QuestionNode(IsSeeing, closeQuestionNode, notSeeingNode);
         root = seeQuestionNode;
-
-        playerRb = Target.GetComponent<Rigidbody>();
-        enemySm = new EnemySM(Target, playerRb, this,arriveDistance, attackRange, speed, movement, wayPoints);
-        movement = new EnemyMovement(transform, obs);
-    }
-
-    void Update()
-    {
-        root.Execute();
-        enemySm.Tick(Time.deltaTime);
-        Debug.Log(enemySm.fsm.CurrentState);
     }
 
     private bool IsSeeing() => LOS.Sight();
@@ -78,9 +54,5 @@ public class EnemyController : MonoBehaviour
         enemySm.SwitchState(EnemyStatesEnum.Attack);
     }
 
-    public void Move(Vector3 target, float speed)
-    {
-        movement.Move(target, Time.deltaTime, speed);
-    }
 }
- 
+
