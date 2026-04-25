@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour
+public class PointScorer : MonoBehaviour
 {
     [SerializeField] public Dictionary<float, float> pointsAndChances = new Dictionary<float, float>();
+    [SerializeField] public float points;
+    [SerializeField] private Text text;
 
     RoulletteWheel roulette; 
     void Start()
@@ -13,23 +15,18 @@ public class NewBehaviourScript : MonoBehaviour
         pointsAndChances.Add(1, 10);
         pointsAndChances.Add(5, 5);
         pointsAndChances.Add(10, 1);
-    }
-    private void Update()
-    {
-        AddPoint();
+        points = 0;
     }
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Point"))
         {
             AddPoint();
-            Destroy(other.gameObject);
         }
     }
-
     void AddPoint()
     {
-
-        Debug.Log(roulette.RouletteWheelSelection<float>(pointsAndChances));
+        points += roulette.RouletteWheelSelection<float>(pointsAndChances);
+        text.UpdateText(points);
     }
 }

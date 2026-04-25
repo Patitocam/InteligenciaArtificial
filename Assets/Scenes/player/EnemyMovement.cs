@@ -4,78 +4,77 @@ public class EnemyMovement
 {
     private Transform owner;
     private Rigidbody ownerRB;
-
-    private float avoidanceRayLength = 2.5f;
-    private float avoidanceStrength = 15;
-    private float avoidanceRayAngle = 30;
     private LayerMask obstacleLayer;
 
-    public EnemyMovement(Transform transformOwner, LayerMask obs)
+    // Parámetros del avoidance
+    private float detectionRadius;
+    private float detectionAngle;
+    private float personalArea;
+    private Collider[] colliders;
+
+    public EnemyMovement(Transform transformOwner, LayerMask obs,
+        float detectionRadius = 6f, float detectionAngle = 120f,
+        float personalArea = 0.5f, int maxObstacles = 5)
     {
         owner = transformOwner;
         ownerRB = transformOwner.GetComponent<Rigidbody>();
         obstacleLayer = obs;
+        this.detectionRadius = detectionRadius;
+        this.detectionAngle = detectionAngle;
+        this.personalArea = personalArea;
+        colliders = new Collider[maxObstacles];
     }
 
-    public void Move(Vector3 target, float speed, float delta)
+    public void Move(Vector3 desiredDirection, float speed, float delta)
     {
-        Vector3 finalDir = ApplyObstacleAvoidance(target);
+        Vector3 finalDir = GetAvoidanceDir(desiredDirection);
         finalDir.y = 0;
+        finalDir = finalDir.normalized;
         Debug.DrawLine(owner.position, owner.position + finalDir, Color.magenta);
         ownerRB.MovePosition(ownerRB.position + finalDir * speed * delta);
     }
 
-    private Vector3 ApplyObstacleAvoidance(Vector3 desiredDirection)
+    private Vector3 GetAvoidanceDir(Vector3 currentDir)
     {
-        Vector3 avoidance = GetAvoidanceForce(desiredDirection);
+        int count = Physics.OverlapSphereNonAlloc(owner.position, detectionRadius, colliders, obstacleLayer);
 
-        if (avoidance == Vector3.zero)
-            return desiredDirection;
+        Collider nearestColl = null;
+        float nearestDistance = float.MaxValue;
+        Vector3 nearestClosestPoint = Vector3.zero;
 
-        Vector3 finalDirection = (desiredDirection + avoidance * avoidanceStrength).normalized;
-        return finalDirection;
-    }
-
-    private Vector3 GetAvoidanceForce(Vector2 desiredDirection)
-    {
-        Vector3 avoidance = Vector3.zero;
-
-
-        if (Physics.Raycast(owner.position, desiredDirection, out RaycastHit hitCenter, avoidanceRayLength, obstacleLayer))
+        for (int i = 0; i < count; i++)
         {
+            Vector3 closestPoint = colliders[i].ClosestPoint(owner.position);
+            closestPoint.y = owner.position.y;
 
-            Vector3 avoid = Vector3.Cross(hitCenter.normal, Vector3.up);
+            Vector3 dirToColl = closestPoint - owner.position;
+            float distance = dirToColl.magnitude;
+            float angle = Vector3.Angle(dirToColl, currentDir);
 
- 
-            if (Vector3.Dot(avoid, owner.right) < 0)
-                avoid = -avoid;
+            // Ignorar obstáculos fuera del ángulo de visión
+            if (angle > detectionAngle / 2) continue;
 
-            avoidance += avoid;
+            if (distance < nearestDistance)
+            {
+                nearestColl = colliders[i];
+                nearestDistance = distance;
+                nearestClosestPoint = closestPoint;
+            }
         }
 
+        // Sin obstáculos, seguir dirección deseada
+        if (nearestColl == null) return currentDir;
 
-        Vector3 leftDir = Quaternion.Euler(0, -avoidanceRayAngle, 0) * desiredDirection;
-        if (Physics.Raycast(owner.position, leftDir, out RaycastHit hitLeft, avoidanceRayLength, obstacleLayer))
-        {
-            Vector3 avoid = Vector3.Cross(hitLeft.normal, Vector3.up);
-            if (Vector3.Dot(avoid, owner.right) < 0)
-                avoid = -avoid;
+        // Determinar hacia qué lado esquivar usando espacio local
+        Vector3 relativePos = owner.InverseTransformPoint(nearestClosestPoint);
+        Vector3 dirToObstacle = (nearestClosestPoint - owner.position).normalized;
 
-            avoidance += avoid;
-        }
+        Vector3 avoidDir = relativePos.x < 0
+            ? Vector3.Cross(owner.up, dirToObstacle)   // obstáculo a la izquierda → girar derecha
+            : -Vector3.Cross(owner.up, dirToObstacle); // obstáculo a la derecha → girar izquierda
 
-
-        Vector3 rightDir = Quaternion.Euler(0, avoidanceRayAngle, 0) * desiredDirection;
-        if (Physics.Raycast(owner.position, rightDir, out RaycastHit hitRight, avoidanceRayLength, obstacleLayer))
-        {
-            Vector3 avoid = Vector3.Cross(hitRight.normal, Vector3.up);
-            if (Vector3.Dot(avoid, owner.right) < 0)
-                avoid = -avoid;
-
-            avoidance += avoid;
-        }
-
-        return avoidance.normalized;
+        // Lerp: cuanto más cerca el obstáculo, más fuerte el avoidance
+        float weight = (detectionRadius - Mathf.Clamp(nearestDistance - personalArea, 0, detectionRadius)) / detectionRadius;
+        return Vector3.Lerp(currentDir, avoidDir, weight);
     }
 }
-

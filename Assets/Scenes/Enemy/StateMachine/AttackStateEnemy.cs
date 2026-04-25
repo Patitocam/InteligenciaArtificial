@@ -1,11 +1,16 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 public class AttackStateEnemy : EnemyStates
 {
     private EnemySM sm;
+    EntityController owner;
+    Collider[] collisions;
 
-    public AttackStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, GameObject Target) : base(stateMachine)
+    public AttackStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, GameObject Target, EntityController owner) : base(stateMachine)
     {
         this.sm = sm;
+        this.owner = owner;
+        collisions = new Collider[5];
     }
     public override void Tick(float deltaTime)
     {
@@ -14,7 +19,14 @@ public class AttackStateEnemy : EnemyStates
     }
     private void Attack()
     {
-        Debug.Log("Im Attacking");
+        Physics.OverlapSphereNonAlloc(owner.transform.position, 1.5f, collisions);
+        foreach (Collider collider in collisions)
+        {
+            if (collider.CompareTag("Player"))
+            {
+                SceneManager.LoadScene("Game");
+            }
+        }
     }
 
 }

@@ -23,7 +23,7 @@ public class EnemySM
         fsm.AddState(new PatrolStateEnemy(this, fsm, owner, speed, wayPoints), EnemyStatesEnum.Patrolling);
         fsm.AddState(new RunAwayStateEnemy(this, fsm, Target, owner, speed), EnemyStatesEnum.RunAway);
         fsm.AddState(new ChaseStateEnemy(this, fsm, Target, rb, owner, speed), EnemyStatesEnum.Chasing);
-        fsm.AddState(new AttackStateEnemy(this, fsm, Target), EnemyStatesEnum.Attack);
+        fsm.AddState(new AttackStateEnemy(this, fsm, Target, owner), EnemyStatesEnum.Attack);
         fsm.AddState(new ArriveStateEnemy(this, fsm, Target, owner, arriveDistance, attackRange, speed), EnemyStatesEnum.Arrive);
         fsm.SetCurrent(idle);
     }
