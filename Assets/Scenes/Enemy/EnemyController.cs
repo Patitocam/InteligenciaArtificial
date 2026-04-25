@@ -15,6 +15,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float arriveDistance;
     [SerializeField] private float attackRange;
     [SerializeField] private float speed;
+    [SerializeField] private Transform[] wayPoints;
 
     private EnemySM enemySm;
     private EnemyMovement movement;
@@ -45,7 +46,7 @@ public class EnemyController : MonoBehaviour
         root = seeQuestionNode;
 
         playerRb = Target.GetComponent<Rigidbody>();
-        enemySm = new EnemySM(Target, playerRb, this,arriveDistance, attackRange, speed, movement);
+        enemySm = new EnemySM(Target, playerRb, this,arriveDistance, attackRange, speed, movement, wayPoints);
         movement = new EnemyMovement(transform, obs);
     }
 
@@ -66,7 +67,7 @@ public class EnemyController : MonoBehaviour
     }
     void NotSeeingPlayer()
     {
-        enemySm.SwitchState(EnemyStatesEnum.Idle);
+        enemySm.SwitchState(EnemyStatesEnum.Patrolling);
     }
     void InRange()
     {

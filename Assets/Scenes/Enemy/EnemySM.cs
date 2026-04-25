@@ -15,12 +15,12 @@ public class EnemySM
 {
     public GenericStateMachine<EnemyStatesEnum> fsm;
 
-    public EnemySM(GameObject Target, Rigidbody rb, EnemyController owner, float arriveDistance, float attackRange, float speed, EnemyMovement movement)
+    public EnemySM(GameObject Target, Rigidbody rb, EnemyController owner, float arriveDistance, float attackRange, float speed, EnemyMovement movement, Transform[] wayPoints)
     {
         fsm = new GenericStateMachine<EnemyStatesEnum>();
         var idle = new IdleStateEnemy(this, fsm);
         fsm.AddState(idle, EnemyStatesEnum.Idle);
-        fsm.AddState(new PatrolStateEnemy(this, fsm), EnemyStatesEnum.Patrolling);
+        fsm.AddState(new PatrolStateEnemy(this, fsm, owner, speed, wayPoints), EnemyStatesEnum.Patrolling);
         fsm.AddState(new RunAwayStateEnemy(this, fsm, Target, owner, speed), EnemyStatesEnum.RunAway);
         fsm.AddState(new ChaseStateEnemy(this, fsm, Target, rb, owner, speed), EnemyStatesEnum.Chasing);
         fsm.AddState(new AttackStateEnemy(this, fsm, Target), EnemyStatesEnum.Attack);

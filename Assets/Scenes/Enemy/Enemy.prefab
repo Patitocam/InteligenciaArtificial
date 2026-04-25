@@ -333,7 +333,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Target: {fileID: 0}
   viewAngle: 360
-  viewLenght: 15
+  viewLenght: 0
   wallsAndObs:
     serializedVersion: 2
     m_Bits: 16
@@ -344,6 +344,7 @@ MonoBehaviour:
   arriveDistance: 7
   attackRange: 2
   speed: 7
+  wayPoints: []
 --- !u!54 &871619400820985891
 Rigidbody:
   m_ObjectHideFlags: 0
