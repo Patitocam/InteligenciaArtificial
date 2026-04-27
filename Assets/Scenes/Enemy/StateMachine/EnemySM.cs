@@ -8,31 +8,44 @@ public enum EnemyStatesEnum
     Chasing,
     RunAway,
     Attack,
-    Arrive
+    Arrive,
+    Thinking,
 }
 
-public class EnemySM 
+public class EnemySM
 {
     public GenericStateMachine<EnemyStatesEnum> fsm;
+
+    public ThinkingStateEnemy ThinkingState { get; private set; }
 
     public EnemySM(GameObject Target, Rigidbody rb, EntityController owner, float arriveDistance, float attackRange, float speed, EnemyMovement movement, Transform[] wayPoints)
     {
         fsm = new GenericStateMachine<EnemyStatesEnum>();
+
         var idle = new IdleStateEnemy(this, fsm);
+        ThinkingState = new ThinkingStateEnemy(this, fsm, thinkTime: 1f);
+
         fsm.AddState(idle, EnemyStatesEnum.Idle);
         fsm.AddState(new PatrolStateEnemy(this, fsm, owner, speed, wayPoints), EnemyStatesEnum.Patrolling);
         fsm.AddState(new RunAwayStateEnemy(this, fsm, Target, owner, speed), EnemyStatesEnum.RunAway);
         fsm.AddState(new ChaseStateEnemy(this, fsm, Target, rb, owner, speed), EnemyStatesEnum.Chasing);
         fsm.AddState(new AttackStateEnemy(this, fsm, Target, owner), EnemyStatesEnum.Attack);
         fsm.AddState(new ArriveStateEnemy(this, fsm, Target, owner, arriveDistance, attackRange, speed), EnemyStatesEnum.Arrive);
+        fsm.AddState(ThinkingState, EnemyStatesEnum.Thinking);
+
         fsm.SetCurrent(idle);
     }
+
     public EnemySM(GameObject Target, Rigidbody rb, EntityController owner, float speed, EnemyMovement movement)
     {
         fsm = new GenericStateMachine<EnemyStatesEnum>();
+
         var idle = new IdleStateEnemy(this, fsm);
+        ThinkingState = new ThinkingStateEnemy(this, fsm, thinkTime: 1f);
+
         fsm.AddState(idle, EnemyStatesEnum.Idle);
         fsm.AddState(new RunAwayStateEnemy(this, fsm, Target, owner, speed), EnemyStatesEnum.RunAway);
+        fsm.AddState(ThinkingState, EnemyStatesEnum.Thinking);
         fsm.SetCurrent(idle);
     }
 
@@ -41,9 +54,14 @@ public class EnemySM
         fsm.Update(deltaTime);
     }
 
-    public void SwitchState(EnemyStatesEnum newState) 
+    public void SwitchState(EnemyStatesEnum newState)
     {
         fsm.ChangeState(newState);
     }
-}
 
+    public void SwitchStateWithThinking(EnemyStatesEnum nextState)
+    {
+        ThinkingState.SetNextState(nextState);
+        fsm.ChangeState(EnemyStatesEnum.Thinking);
+    }
+}

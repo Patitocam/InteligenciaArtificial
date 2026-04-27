@@ -39,12 +39,17 @@ public class ChaserController : EntityController
 
     void SeeingPlayer()
     {
-        enemySm.SwitchState(EnemyStatesEnum.Chasing);
+        // Sólo transiciona si NO está ya persiguiendo o pensando
+        if (enemySm.fsm.CurrentState is ChaseStateEnemy || enemySm.fsm.CurrentState is ThinkingStateEnemy) return;
     }
+
     void NotSeeingPlayer()
     {
-        enemySm.SwitchState(EnemyStatesEnum.Patrolling);
+        // Sólo transiciona si NO está ya patrullando o pensando
+        if (enemySm.fsm.CurrentState is PatrolStateEnemy || enemySm.fsm.CurrentState is ThinkingStateEnemy) return;
+        enemySm.SwitchStateWithThinking(EnemyStatesEnum.Patrolling); // <-- pausa antes de patrullar
     }
+
     void InRange()
     {
         enemySm.SwitchState(EnemyStatesEnum.Arrive);
@@ -53,6 +58,4 @@ public class ChaserController : EntityController
     {
         enemySm.SwitchState(EnemyStatesEnum.Attack);
     }
-
 }
-
