@@ -1,4 +1,5 @@
-﻿using Unity.VisualScripting;
+﻿using System.Drawing;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyMovement
@@ -40,7 +41,7 @@ public class EnemyMovement
     private Vector3 GetAvoidanceDir(Vector3 currentDir)
     {
         int count = Physics.OverlapSphereNonAlloc(owner.position, detectionRadius, colliders, obstacleLayer); //Creamos una esfera y contamos sus colisiones
-
+        float realAngle = 40;
         Collider nearestObs = null;
         float nearestDistance = 0;
         Vector3 nearestClosestPoint = Vector3.zero;
@@ -53,11 +54,15 @@ public class EnemyMovement
             Vector3 dirToObs = closestPoint - owner.position; //Dirección al obstaculo
             float distance = dirToObs.magnitude; //Distancia al obstaculo
 
+
             if (nearestObs == null || distance < nearestDistance) //Seleccionamos el obstáculo mas cercano 
             {
-                nearestObs = colliders[i];
-                nearestDistance = distance;
-                nearestClosestPoint = closestPoint;
+                if (!(Vector3.Angle(owner.forward, currentDir) > realAngle))
+                {
+                    nearestObs = colliders[i];
+                    nearestDistance = distance;
+                    nearestClosestPoint = closestPoint;
+                } 
             }
         }
 

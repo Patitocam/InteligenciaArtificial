@@ -38,7 +38,7 @@ public class ArriveStateEnemy: EnemyStates
 
         
         float speedT = speed;
-        if (distance < arriveDistance) speedT = distance;
+        if (distance < arriveDistance) speedT = speed *(distance/arriveDistance);
         if (distance < attackRange) speedT = 0;
 
         var destiny = dir.normalized;
