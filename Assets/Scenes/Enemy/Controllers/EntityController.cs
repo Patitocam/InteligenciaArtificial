@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EntityController : MonoBehaviour
@@ -35,7 +33,7 @@ public class EntityController : MonoBehaviour
         Debug.Log(enemySm.fsm.CurrentState);
     }
 
-    // Hace tick al EnemySM en FixedUpdate para que las transiciones de estados sean más fluidas
+    // Hace tick al EnemySM en FixedUpdate para utilizar físicas correctamente
     private void FixedUpdate()
     {
         enemySm.Tick(Time.fixedDeltaTime);

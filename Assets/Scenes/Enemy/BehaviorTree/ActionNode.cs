@@ -4,7 +4,7 @@
 public class ActionNode: ITreeNode
 {
     Action action;
-    //Recibe una accion (delegado sin retorno)
+    //Recibe una accion para ejecutar
     public ActionNode(Action action)
     {
         this.action = action;

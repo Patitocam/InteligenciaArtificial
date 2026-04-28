@@ -29,15 +29,17 @@ public class EnemyMovement
         Vector3 finalDir = GetAvoidanceDir(desiredDirection);
         finalDir.y = 0;
         finalDir = finalDir.normalized;
+
         if (finalDir != Vector3.zero)
             owner.rotation = Quaternion.LookRotation(finalDir);
+
         ownerRB.MovePosition(ownerRB.position + finalDir * speed * delta);
     }
 
     // El enemigo detecta obstáculos en un radio determinado y calcula una dirección de avoidance para esquivarlos, dando prioridad a los obstáculos más cercanos. Cuanto más cerca esté el enemigo del obstáculo, más fuerte será la dirección de avoidance.
     private Vector3 GetAvoidanceDir(Vector3 currentDir)
     {
-        int count = Physics.OverlapSphereNonAlloc(owner.position, detectionRadius, colliders, obstacleLayer);
+        int count = Physics.OverlapSphereNonAlloc(owner.position, detectionRadius, colliders, obstacleLayer); //Creamos una esfera y contamos sus colisiones
 
         Collider nearestObs = null;
         float nearestDistance = 0;
@@ -45,13 +47,13 @@ public class EnemyMovement
 
         for (int i = 0; i < count; i++)
         {
-            Vector3 closestPoint = colliders[i].ClosestPoint(owner.position);
-            closestPoint.y = owner.position.y;
+            Vector3 closestPoint = colliders[i].ClosestPoint(owner.position); //agarramos el punto mas cercano del obstaculo al owner
+            closestPoint.y = owner.position.y; //cancelamos la Y
 
-            Vector3 dirToObs = closestPoint - owner.position;
-            float distance = dirToObs.magnitude;
+            Vector3 dirToObs = closestPoint - owner.position; //Dirección al obstaculo
+            float distance = dirToObs.magnitude; //Distancia al obstaculo
 
-            if (nearestObs == null || distance < nearestDistance)
+            if (nearestObs == null || distance < nearestDistance) //Seleccionamos el obstáculo mas cercano 
             {
                 nearestObs = colliders[i];
                 nearestDistance = distance;
@@ -62,6 +64,7 @@ public class EnemyMovement
         // Sin obstáculos, seguir dirección deseada
         if (nearestObs == null) return currentDir;
 
+        //Analiza si el obstaculo debe ser esquivado a la izquierda o a la derecha
         Vector3 relativePos = owner.InverseTransformPoint(nearestClosestPoint);
         Vector3 dirToClosetPoint = (nearestClosestPoint - owner.position).normalized;
         Vector3 newDir;
@@ -74,6 +77,7 @@ public class EnemyMovement
             newDir = -Vector3.Cross(Vector3.up, dirToClosetPoint);
         }
 
+        //Devuelve un punto entre la dirección deseada y la dirección para esquivar un obstáculo, según qué tan cerca del obstáculo esté
         return Vector3.Lerp(currentDir, newDir, (detectionRadius - Mathf.Clamp(nearestDistance - personalArea, 0, detectionRadius)) / detectionRadius);
     }
 }

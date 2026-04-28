@@ -1,11 +1,9 @@
 ﻿
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
-using static UnityEditor.PlayerSettings;
-using static UnityEngine.GraphicsBuffer;
 
 public class ChaserController : EntityController
 {
+    //Parametros
     [SerializeField] protected float arriveDistance;
     [SerializeField] protected float attackRange;
     [SerializeField] protected Transform[] wayPoints;
@@ -37,7 +35,9 @@ public class ChaserController : EntityController
 
     // Pregunta si ve al jugador
     private bool IsSeeing() => LOS.Sight(); 
+    //Si está cerca
     private bool IsClose() => (Target.transform.position - this.transform.position).magnitude < arriveDistance;
+    //Si está en rango de ataque
     private bool IsInAttackRange() => (Target.transform.position - this.transform.position).magnitude < attackRange;
 
     
@@ -46,7 +46,7 @@ public class ChaserController : EntityController
         // Sólo transiciona a perseguir si NO está ya persiguiendo o pensando
         if (enemySm.fsm.CurrentState is ChaseStateEnemy || enemySm.fsm.CurrentState is ThinkingStateEnemy) return;
         enemySm.SwitchState(EnemyStatesEnum.Chasing);
-        LOS.ModifyLosAngle();
+        LOS.ModifyLosAngle();//Le da 360 grados de vision para evitar bugs
     }
 
     // 
@@ -54,8 +54,8 @@ public class ChaserController : EntityController
     {
         // Sólo transiciona a patrullar si NO está ya patrullando o pensando
         if (enemySm.fsm.CurrentState is PatrolStateEnemy || enemySm.fsm.CurrentState is ThinkingStateEnemy) return;
-        LOS.ResetLosAngle(viewAngle);
-        enemySm.SwitchStateWithThinking(EnemyStatesEnum.Patrolling); // <-- pausa antes de patrullar 
+        LOS.ResetLosAngle(viewAngle); //Devuelve el ángulo de vision original
+        enemySm.SwitchStateWithThinking(EnemyStatesEnum.Patrolling); // pausa antes de patrullar 
     }
 
     // Cambia a perseguir

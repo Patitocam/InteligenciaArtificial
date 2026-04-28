@@ -14,19 +14,19 @@ public class PointScorer : MonoBehaviour
         roulette = new RoulletteWheel();
         pointsAndChances.Add(1, 10);
         pointsAndChances.Add(5, 5);
-        pointsAndChances.Add(10, 1);
+        pointsAndChances.Add(10, 1); //Agrego numeros que pueden salir al diccionario y sus posibilidades
         points = 0;
     }
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Point"))
         {
-            AddPoint();
+            AddPoint(); //Cuando un Amongus azul entra en el corral llama a sumar punto
         }
     }
     void AddPoint()
     {
-        points += roulette.RouletteWheelSelection<float>(pointsAndChances);
-        text.UpdateText(points);
+        points += roulette.RouletteWheelSelection<float>(pointsAndChances); //Tiro la ruleta, le establezco el tipo float para las salidas y le paso el diccionario 
+        text.UpdateText(points);//Actualizo el texto
     }
 }

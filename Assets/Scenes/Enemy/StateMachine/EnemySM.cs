@@ -14,11 +14,11 @@ public enum EnemyStatesEnum
 
 public class EnemySM
 {
-    public GenericStateMachine<EnemyStatesEnum> fsm;
+    public GenericStateMachine<EnemyStatesEnum> fsm; //Se crea una state machine 
 
-    public ThinkingStateEnemy ThinkingState { get; private set; }
+    public ThinkingStateEnemy ThinkingState { get; private set; } //Thinking state que controla pausas entre estados
 
-    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner, float arriveDistance, float attackRange, float speed, EnemyMovement movement, Transform[] wayPoints)
+    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner, float arriveDistance, float attackRange, float speed, EnemyMovement movement, Transform[] wayPoints) //Constructor para el enemigo Chaser
     {
         fsm = new GenericStateMachine<EnemyStatesEnum>();
 
@@ -36,7 +36,7 @@ public class EnemySM
         fsm.SetCurrent(idle);
     }
 
-    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner, float speed, EnemyMovement movement)
+    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner, float speed, EnemyMovement movement) //Constructor para el enemigo Runner
     {
         fsm = new GenericStateMachine<EnemyStatesEnum>();
 
@@ -49,6 +49,7 @@ public class EnemySM
         fsm.SetCurrent(idle);
     }
 
+    //LLamados a las funciones de la state machine real
     public void Tick(float deltaTime)
     {
         fsm.Update(deltaTime);
