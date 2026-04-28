@@ -359,7 +359,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 0}
-  viewAngle: 75
+  viewAngle: 120
   viewLenght: 30
   wallsAndObs:
     serializedVersion: 2

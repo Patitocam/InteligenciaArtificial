@@ -26,7 +26,6 @@ public class ChaseStateEnemy : EnemyStates
     private void Move()
     {
         owner.Move(Chase(), speed);
-        owner.transform.LookAt(target.transform.position);
     }
     private Vector3 Chase()
     {

@@ -40,7 +40,6 @@ public class ArriveStateEnemy: EnemyStates
         if (distance < attackRange) speedT = 0;
 
         var destiny = dir.normalized;
-        owner.transform.LookAt(target.transform.position);
         return (destiny, speedT);
     }
 }

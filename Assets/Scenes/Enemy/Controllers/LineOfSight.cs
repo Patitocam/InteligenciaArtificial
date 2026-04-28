@@ -29,5 +29,14 @@ public class LineOfSight
         if (Physics.Raycast(transform.position, dir.normalized, dir.magnitude, wallsAndObs)) return false;
         return true;
     }
+
+    public void ModifyLosAngle()
+    {
+        realAngle = 360;
+    }
+    public void ResetLosAngle(float viewAngle)
+    {
+        realAngle = viewAngle / 2;
+    }
 }
 

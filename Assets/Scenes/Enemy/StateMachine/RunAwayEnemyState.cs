@@ -29,7 +29,6 @@ namespace Assets.Scenes.Enemy
         {
             var dir = RunAway();
             owner.Move(dir.Item1, dir.Item2);
-            owner.transform.LookAt(owner.transform.position + dir.Item1);
         }
 
         private (Vector3, float) RunAway()
