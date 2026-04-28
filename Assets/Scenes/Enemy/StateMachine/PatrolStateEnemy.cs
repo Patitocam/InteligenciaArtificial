@@ -9,6 +9,7 @@ public class PatrolStateEnemy: EnemyStates
     Transform[] wayPoints;
     int currentWaypoint;
 
+    // El enemigo se mueve entre los waypoints en orden, rotando para mirar hacia el siguiente waypoint. Si el enemigo llega a un waypoint, se dirige al siguiente.
     public PatrolStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, EntityController owner, float speed, Transform[] wayPoints) : base(stateMachine) 
     {
         this.sm = sm;

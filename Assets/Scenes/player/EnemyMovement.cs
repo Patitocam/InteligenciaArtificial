@@ -12,6 +12,7 @@ public class EnemyMovement
     private float personalArea;
     private Collider[] colliders;
 
+    // El constructor de la clase recibe el transform del enemigo, la capa de obstáculos, el radio de detección para detectar obstáculos, el área personal para evitar que el enemigo se acerque demasiado a los obstáculos y el número máximo de obstáculos a detectar.
     public EnemyMovement(Transform transformOwner, LayerMask obs, float detectionRadius = 7f, float personalArea = 1f, int maxObstacles = 5)
     {
         owner = transformOwner;
@@ -22,6 +23,7 @@ public class EnemyMovement
         colliders = new Collider[maxObstacles];
     }
 
+    // El enemigo se mueve en la dirección deseada, pero ajusta su dirección para evitar obstáculos detectados en su camino.
     public void Move(Vector3 desiredDirection, float speed, float delta)
     {
         Vector3 finalDir = GetAvoidanceDir(desiredDirection);
@@ -32,6 +34,7 @@ public class EnemyMovement
         ownerRB.MovePosition(ownerRB.position + finalDir * speed * delta);
     }
 
+    // El enemigo detecta obstáculos en un radio determinado y calcula una dirección de avoidance para esquivarlos, dando prioridad a los obstáculos más cercanos. Cuanto más cerca esté el enemigo del obstáculo, más fuerte será la dirección de avoidance.
     private Vector3 GetAvoidanceDir(Vector3 currentDir)
     {
         int count = Physics.OverlapSphereNonAlloc(owner.position, detectionRadius, colliders, obstacleLayer);

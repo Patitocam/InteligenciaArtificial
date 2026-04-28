@@ -12,11 +12,14 @@ public class AttackStateEnemy : EnemyStates
         this.owner = owner;
         collisions = new Collider[5];
     }
+ 
     public override void Tick(float deltaTime)
     {
         base.Tick(deltaTime);
         Attack();
     }
+
+    // Si el jugador está en un radio de 1.5 unidades alrededor del enemigo, se recarga la escena (simulando que el jugador muere)
     private void Attack()
     {
         Physics.OverlapSphereNonAlloc(owner.transform.position, 1.5f, collisions);

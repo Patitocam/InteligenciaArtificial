@@ -12,6 +12,7 @@ namespace Assets.Scenes.Enemy
         float speed;
         float speedUpDistance = 10;
 
+        // El enemigo se aleja del objetivo, aumentando su velocidad a medida que se acerca al objetivo, para intentar escapar.
         public RunAwayStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, GameObject Target, EntityController owner, float speed) : base(stateMachine)
         {
             this.sm = sm;
@@ -30,7 +31,8 @@ namespace Assets.Scenes.Enemy
             var dir = RunAway();
             owner.Move(dir.Item1, dir.Item2);
         }
-
+        
+        // cuanto menor sea la distancia mayor sera la verlocidad (limitado a un valor máximo)
         private (Vector3, float) RunAway()
         {
             Vector3 toTarget = target.transform.position - owner.transform.position;

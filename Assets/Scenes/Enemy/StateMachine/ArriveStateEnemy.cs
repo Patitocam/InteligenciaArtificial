@@ -18,6 +18,8 @@ public class ArriveStateEnemy: EnemyStates
         this.arriveDistance = arriveDistance;
         this.attackRange = attackRange;
     }
+
+    // velocidad normal si el enemigo está lejos, velocidad reducida si el enemigo está cerca y velocidad 0 si el enemigo está en rango de ataque
     public override void Tick(float deltaTime)
     {
         base.Tick(deltaTime);

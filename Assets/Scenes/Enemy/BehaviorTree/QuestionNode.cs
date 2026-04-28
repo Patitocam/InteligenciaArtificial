@@ -11,6 +11,7 @@ public class QuestionNode: ITreeNode
     ITreeNode falseNode;
     private Func<bool> question;
 
+    //recibe una Func que devuelve un bool (la pregunta a evaluar) y dos nodos (el nodo verdadero y el nodo falso)
     public QuestionNode(Func<bool> question, ITreeNode trueNode, ITreeNode falseNode)
     {
         this.trueNode = trueNode;
@@ -18,6 +19,7 @@ public class QuestionNode: ITreeNode
         this.question = question;
     }
 
+    //evalua la pregunta, si es verdadera ejecuta el nodo verdadero, sino el nodo falso
     public void Execute()
     {
         if (question.Invoke()) trueNode.Execute();

@@ -17,16 +17,20 @@ public class ChaseStateEnemy : EnemyStates
         this.playerRB = playerRb;
         this.speed = speed;
     }
+
     public override void Tick(float deltaTime)
     {
         base.Tick(deltaTime);
         Move();
     }
 
+    // El enemigo se mueve hacia una posición futura del jugador, prediciendo su movimiento actual. Si el jugador está quieto, se mueve hacia su posición actual.
     private void Move()
     {
         owner.Move(Chase(), speed);
     }
+
+    // Calcula la dirección hacia la posición futura del jugador. Si el jugador está quieto, la posición futura es su posición actual. Si el jugador se está moviendo, se predice su posición futura en función de su velocidad actual y la distancia al enemigo.
     private Vector3 Chase()
     {
         Vector3 toTarget = target.transform.position - owner.transform.position;
