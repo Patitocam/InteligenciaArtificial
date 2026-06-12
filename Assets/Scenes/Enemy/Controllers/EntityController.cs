@@ -30,7 +30,6 @@ public class EntityController : MonoBehaviour
     void Update()
     {
         root.Execute();
-        Debug.Log(enemySm.fsm.CurrentState);
     }
 
     // Hace tick al EnemySM en FixedUpdate para utilizar físicas correctamente

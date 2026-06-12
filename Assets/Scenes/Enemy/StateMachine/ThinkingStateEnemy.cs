@@ -23,7 +23,6 @@ public class ThinkingStateEnemy : EnemyStates
     public override void Enter()
     {
         timer = 0f;
-        Debug.Log("[Thinking] Hmm...");
     }
 
     // El enemigo permanece en este estado durante un tiempo determinado (thinkTime) antes de cambiar al siguiente estado configurado.

@@ -19,7 +19,6 @@ public class IdleStateEnemy: EnemyStates
     }
     private void Idle()
     {
-        Debug.Log("Im idle");
     }
 
 }
