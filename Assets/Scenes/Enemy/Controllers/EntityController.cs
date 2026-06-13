@@ -18,7 +18,6 @@ public class EntityController : MonoBehaviour
     protected QuestionNode root;
     protected Rigidbody playerRb;
 
-    // Inicializa el LineOfSight, el EnemySM y el EnemyMovement con los parámetros necesarios
     virtual public void Start()
     {
         LOS = new LineOfSight(Target, viewAngle, viewLenght, wallsAndObs, this.transform);
@@ -26,22 +25,26 @@ public class EntityController : MonoBehaviour
         movement = new EnemyMovement(transform, obs);
     }
 
-    // Ejecuta el tree de comportamiento y hace tick al EnemySM
     void Update()
     {
         root.Execute();
+        Debug.Log(enemySm.fsm.CurrentState);
     }
 
-    // Hace tick al EnemySM en FixedUpdate para utilizar físicas correctamente
     private void FixedUpdate()
     {
         enemySm.Tick(Time.fixedDeltaTime);
     }
 
-    // Llama al método Move del EnemyMovement para mover al enemigo hacia el objetivo con la velocidad dada
-    public void Move(Vector3 target, float speed)
+    // Con avoidance — para Chase, RunAway, Arrive
+    public void Move(Vector3 direction, float speed)
     {
-        movement.Move(target, speed, Time.fixedDeltaTime);
+        movement.Move(direction, speed, Time.fixedDeltaTime);
+    }
+
+    // Sin avoidance — para Patrol con A* (el path ya esquiva obstáculos)
+    public void MoveRaw(Vector3 direction, float speed)
+    {
+        movement.MoveRaw(direction, speed, Time.fixedDeltaTime);
     }
 }
- 

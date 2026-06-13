@@ -1,7 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-
-public class PatrolStateEnemy: EnemyStates
+public class PatrolStateEnemy : EnemyStates
 {
     private EnemySM sm;
     EntityController owner;
@@ -9,39 +9,83 @@ public class PatrolStateEnemy: EnemyStates
     Transform[] wayPoints;
     int currentWaypoint;
 
-    // El enemigo se mueve entre los waypoints en orden, rotando para mirar hacia el siguiente waypoint. Si el enemigo llega a un waypoint, se dirige al siguiente.
-    public PatrolStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, EntityController owner, float speed, Transform[] wayPoints) : base(stateMachine) 
+    GridGenerator grid;
+    List<PfNode> currentPath = new();
+    int pathIndex = 0;
+
+    public PatrolStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine,
+        EntityController owner, float speed, Transform[] wayPoints, GridGenerator grid) : base(stateMachine)
     {
         this.sm = sm;
         this.owner = owner;
         this.speed = speed / 2;
         this.wayPoints = wayPoints;
+        this.grid = grid;
         currentWaypoint = 0;
     }
+
+    public override void Enter()
+    {
+        RecalculatePath();
+    }
+
     public override void Tick(float deltaTime)
     {
         base.Tick(deltaTime);
         Move();
     }
-    public void Move()
+
+    private void Move()
     {
-        owner.Move(Patrol(), speed);
-    }
-    private Vector3 Patrol()
-    {
-        if (wayPoints.Length == 0) return Vector3.zero;
+        if (currentPath == null || currentPath.Count == 0) return;
 
-        Transform target = wayPoints[currentWaypoint];
-
-        Vector3 direction = (target.position - owner.transform.position).normalized;
-        
-        owner.transform.LookAt(target.position);
-
-        if ((target.position - owner.transform.position).magnitude < 1f)
+        if (pathIndex >= currentPath.Count)
         {
             currentWaypoint = (currentWaypoint + 1) % wayPoints.Length;
+            RecalculatePath();
+            return;
         }
-        return direction;
+
+        Vector3 targetPos = currentPath[pathIndex].transform.position;
+
+        // Solo comparamos XZ evita que diferencias mínimas de altura confundan la llegada
+        Vector3 ownerXZ = new Vector3(owner.transform.position.x, 0, owner.transform.position.z);
+        Vector3 targetXZ = new Vector3(targetPos.x, 0, targetPos.z);
+        Vector3 direction = (targetXZ - ownerXZ).normalized;
+
+        // MoveRaw A* ya garantiza que el camino esquiva obstáculos
+        owner.MoveRaw(direction, speed);
+
+        if ((targetXZ - ownerXZ).magnitude < 0.4f)
+        {
+            pathIndex++;
+            if (pathIndex >= currentPath.Count)
+            {
+                currentWaypoint = (currentWaypoint + 1) % wayPoints.Length;
+                RecalculatePath();
+            }
+        }
+    }
+
+    private void RecalculatePath()
+    {
+        PfNode startNode = GetClosestNode(owner.transform.position);
+        PfNode endNode = GetClosestNode(wayPoints[currentWaypoint].position);
+        if (startNode == null || endNode == null) return;
+        currentPath = PathFinding.Astar(startNode, endNode);
+        pathIndex = 0;
+    }
+
+    private PfNode GetClosestNode(Vector3 worldPos)
+    {
+        PfNode closest = null;
+        float minDist = float.MaxValue;
+        foreach (PfNode node in grid.nodeGrid)
+        {
+            if (!node.Reacheable) continue;
+            float dist = Vector3.Distance(worldPos, node.transform.position);
+            if (dist < minDist) { minDist = dist; closest = node; }
+        }
+        return closest;
     }
 }
-

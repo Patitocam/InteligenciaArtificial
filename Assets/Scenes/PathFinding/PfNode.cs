@@ -9,7 +9,6 @@ public class PfNode : MonoBehaviour
     [SerializeField] private int x, y;
     [SerializeField] private float cost = 1;
     private Renderer rend;
-    private BoxCollider coll;
 
     [SerializeField] private bool reacheable = true;
     public List<PfNode> Neighbors => neighbors;
@@ -22,7 +21,7 @@ public class PfNode : MonoBehaviour
     private void Awake()
     {
         rend = GetComponent<Renderer>();
-        coll = GetComponent<BoxCollider>();
+
         reacheable = Check();
     }
 
@@ -38,7 +37,7 @@ public class PfNode : MonoBehaviour
 
     bool Check()
     {
-        Collider[] collisions = Physics.OverlapBox(transform.position, coll.size, transform.rotation, LayerMask.GetMask("Walls"));
+        Collider[] collisions = Physics.OverlapBox(transform.position, new Vector3(1,1,1), transform.rotation, LayerMask.GetMask("Walls"));
 
         foreach (Collider col in collisions) 
         {
