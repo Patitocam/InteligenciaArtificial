@@ -28,7 +28,6 @@ public class EntityController : MonoBehaviour
     void Update()
     {
         root.Execute();
-        Debug.Log(enemySm.fsm.CurrentState);
     }
 
     private void FixedUpdate()
@@ -36,13 +35,13 @@ public class EntityController : MonoBehaviour
         enemySm.Tick(Time.fixedDeltaTime);
     }
 
-    // Con avoidance — para Chase, RunAway, Arrive
+    // Con avoidance, para Chase, RunAway, Arrive
     public void Move(Vector3 direction, float speed)
     {
         movement.Move(direction, speed, Time.fixedDeltaTime);
     }
 
-    // Sin avoidance — para Patrol con A* (el path ya esquiva obstáculos)
+    // Sin avoidance, para Patrol con A* (el path ya esquiva obstáculos)
     public void MoveRaw(Vector3 direction, float speed)
     {
         movement.MoveRaw(direction, speed, Time.fixedDeltaTime);

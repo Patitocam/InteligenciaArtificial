@@ -37,17 +37,22 @@ public class PfNode : MonoBehaviour
 
     bool Check()
     {
-        Collider[] collisions = Physics.OverlapBox(transform.position, new Vector3(1,1,1), transform.rotation, LayerMask.GetMask("Walls"));
+        Collider[] collisions = Physics.OverlapBox(transform.position, new Vector3(1,1,1), transform.rotation);
 
         foreach (Collider col in collisions) 
         {
 
-            if (LayerMask.LayerToName(col.gameObject.layer) == "Walls")
+            if (LayerMask.LayerToName(col.gameObject.layer) == "Walls" )
             {
                 neighbors = new List<PfNode>();
                 return false;
             }
-            else return true;
+            if (LayerMask.LayerToName(col.gameObject.layer) == "Obstacles")
+            {
+                Debug.Log("Obs");
+                neighbors = new List<PfNode>();
+                return false;
+            }
         }
         return true;
     }

@@ -13,8 +13,7 @@ public class PatrolStateEnemy : EnemyStates
     List<PfNode> currentPath = new();
     int pathIndex = 0;
 
-    public PatrolStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine,
-        EntityController owner, float speed, Transform[] wayPoints, GridGenerator grid) : base(stateMachine)
+    public PatrolStateEnemy(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, EntityController owner, float speed, Transform[] wayPoints, GridGenerator grid) : base(stateMachine)
     {
         this.sm = sm;
         this.owner = owner;
@@ -53,7 +52,6 @@ public class PatrolStateEnemy : EnemyStates
         Vector3 targetXZ = new Vector3(targetPos.x, 0, targetPos.z);
         Vector3 direction = (targetXZ - ownerXZ).normalized;
 
-        // MoveRaw A* ya garantiza que el camino esquiva obstáculos
         owner.MoveRaw(direction, speed);
 
         if ((targetXZ - ownerXZ).magnitude < 0.4f)

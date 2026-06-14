@@ -18,9 +18,7 @@ public class EnemySM
     public ThinkingStateEnemy ThinkingState { get; private set; }
 
     // Constructor Chaser: recibe GridGenerator para A* patrol
-    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner,
-        float arriveDistance, float attackRange, float speed,
-        EnemyMovement movement, Transform[] wayPoints, GridGenerator grid)
+    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner, float arriveDistance, float attackRange, float speed, EnemyMovement movement, Transform[] wayPoints, GridGenerator grid)
     {
         fsm = new GenericStateMachine<EnemyStatesEnum>();
 
@@ -38,9 +36,27 @@ public class EnemySM
         fsm.SetCurrent(idle);
     }
 
+    //Constructor del Grouper
+    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner, float arriveDistance, float attackRange, float speed, EnemyMovement movement, Transform[] wayPoints) 
+    { 
+        fsm = new GenericStateMachine<EnemyStatesEnum>();
+
+        var idle = new IdleStateEnemy(this, fsm);
+        ThinkingState = new ThinkingStateEnemy(this, fsm, thinkTime: 1f);
+
+        fsm.AddState(idle, EnemyStatesEnum.Idle);
+        fsm.AddState(new FlockingPatrol(this, fsm, owner, speed, wayPoints), EnemyStatesEnum.Patrolling);
+        fsm.AddState(new RunAwayStateEnemy(this, fsm, Target, owner, speed), EnemyStatesEnum.RunAway);
+        fsm.AddState(new ChaseStateEnemy(this, fsm, Target, rb, owner, speed), EnemyStatesEnum.Chasing);
+        fsm.AddState(new AttackStateEnemy(this, fsm, Target, owner), EnemyStatesEnum.Attack);
+        fsm.AddState(new ArriveStateEnemy(this, fsm, Target, owner, arriveDistance, attackRange, speed), EnemyStatesEnum.Arrive);
+        fsm.AddState(ThinkingState, EnemyStatesEnum.Thinking);
+
+        fsm.SetCurrent(idle);
+    }
+
     // Constructor Runner: sin patrol ni A*
-    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner,
-        float speed, EnemyMovement movement)
+    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner, float speed, EnemyMovement movement)
     {
         fsm = new GenericStateMachine<EnemyStatesEnum>();
 

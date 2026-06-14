@@ -6,8 +6,6 @@ public class ChaserController : EntityController
     [SerializeField] protected float arriveDistance;
     [SerializeField] protected float attackRange;
     [SerializeField] protected Transform[] wayPoints;
-
-    // Arrastrá el GridGenerator de la escena aquí desde el Inspector
     [SerializeField] protected GridGenerator grid;
 
     ActionNode seeingNode;
