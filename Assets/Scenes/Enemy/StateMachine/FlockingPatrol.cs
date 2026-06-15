@@ -11,12 +11,12 @@ public class FlockingPatrol: EnemyStates
     int currentWaypoint;
 
     private Vector3 velocity;
-    private float maxForce = 10f;
+    private float maxForce = 5f;
     private float maxSpeed;
 
     private float separationWeight = 3f;
-    private float cohesionWeight = 1f;
-    private float allignmentWeight = 1f;
+    private float cohesionWeight = 0.5f;
+    private float allignmentWeight = 1.5f;
 
     float separationRadius = 1.5f;
     float cohesionRadius = 6f;
@@ -26,7 +26,7 @@ public class FlockingPatrol: EnemyStates
         this.sm = sm;
         this.owner = owner;
         this.speed = speed / 2;
-        this.maxSpeed = speed / 2;
+        this.maxSpeed = speed;
         this.wayPoints = wayPoints;
         currentWaypoint = 0;
     }
@@ -44,13 +44,13 @@ public class FlockingPatrol: EnemyStates
 
     private void Move()
     {
-        Flocking();
+       Flocking();
        owner.Move(velocity, speed);
     }
 
     private void Flocking()
     {
-       AddForce(Separation() * separationWeight + Cohesion() * cohesionWeight + Allignment() * allignmentWeight + SeekWaypoint() * 2);
+       AddForce(Separation() * separationWeight + Cohesion() * cohesionWeight + Allignment() * allignmentWeight + SeekWaypoint() * 3);
     }
 
     private Vector3 Separation() 
@@ -115,15 +115,30 @@ public class FlockingPatrol: EnemyStates
     {
         if(wayPoints.Length == 0) return Vector3.zero;
 
-        Transform target = wayPoints[currentWaypoint];
+        var boidsInRange = Physics.OverlapSphere(owner.transform.position, cohesionRadius * 2f, LayerMask.GetMask("Boids"));
+        Vector3 groupCenter = owner.transform.position;
+        int cont = 1; 
 
-        float distance = Vector3.Distance(owner.transform.position, target.position);
-        if (distance < 0.4f)
+        foreach (var b in boidsInRange)
+        {
+            if (b.transform == owner.transform) continue;
+            groupCenter += b.transform.position;
+            cont++;
+        }
+        groupCenter /= cont;
+
+        Transform target = wayPoints[currentWaypoint];
+        float distanceToWaypoint = Vector3.Distance(groupCenter, target.position);
+        if (distanceToWaypoint < 1.5f)
         {
             currentWaypoint = (currentWaypoint + 1) % wayPoints.Length;
             target = wayPoints[currentWaypoint];
         }
-        return Seek(target.position);
+
+        Vector3 offset = owner.transform.position - groupCenter;
+        Vector3 targetWithOffset = target.position + offset;
+
+        return Seek(targetWithOffset);
     }
 
     private Vector3 Seek(Vector3 target)
@@ -135,12 +150,12 @@ public class FlockingPatrol: EnemyStates
     private Vector3 CalculateSteering(Vector3 desired)
     {
         Vector3 steering = desired - velocity;
-        return Vector3.ClampMagnitude(steering, maxForce * Time.deltaTime);
+        return Vector3.ClampMagnitude(steering, maxForce);
     }
 
     private void AddForce(Vector3 force)
     {
-        velocity = Vector3.ClampMagnitude(velocity + force, maxSpeed);
+        velocity = Vector3.ClampMagnitude(velocity + force * Time.fixedDeltaTime, maxSpeed);
     }
 
 }
