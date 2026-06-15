@@ -8,16 +8,19 @@ public class EnemyMovement
 
     private float detectionRadius;
     private float personalArea;
+    private float avoidanceAngle;
     private Collider[] colliders;
 
+
     public EnemyMovement(Transform transformOwner, LayerMask obs,
-        float detectionRadius = 7f, float personalArea = 1f, int maxObstacles = 5)
+        float detectionRadius = 7f, float personalArea = 1f, float avoidanceAngle = 70f, int maxObstacles = 5)
     {
         owner = transformOwner;
         ownerRB = transformOwner.GetComponent<Rigidbody>();
         obstacleLayer = obs;
         this.detectionRadius = detectionRadius;
         this.personalArea = personalArea;
+        this.avoidanceAngle = avoidanceAngle;
         colliders = new Collider[maxObstacles];
     }
 
@@ -51,11 +54,19 @@ public class EnemyMovement
         float nearestDistance = 0;
         Vector3 nearestClosestPoint = Vector3.zero;
 
+
+
         for (int i = 0; i < count; i++)
         {
+
             Vector3 closestPoint = colliders[i].ClosestPoint(owner.position);
             closestPoint.y = owner.position.y;
-            float distance = (closestPoint - owner.position).magnitude;
+
+            Vector3 dirToObs = closestPoint - owner.position;
+            float distance = dirToObs.magnitude;
+            float angle = Vector3.Angle(currentDir, dirToObs);
+
+            if (angle > avoidanceAngle) continue;
 
             if (nearestObs == null || distance < nearestDistance)
             {
