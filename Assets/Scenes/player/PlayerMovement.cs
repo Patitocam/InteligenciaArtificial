@@ -21,6 +21,6 @@ public class PlayerMovement : MonoBehaviour
 
     void moveCharacter(Vector3 direction)
     {
-        rb.velocity = direction.normalized * speed ;
+        rb.velocity = -direction.normalized * speed ;
     }
 }
