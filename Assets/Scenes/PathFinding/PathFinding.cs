@@ -34,10 +34,11 @@ public class PathFinding
                 if (!next.Reacheable) continue;
 
                 var newCost = costSoFar[current] + next.Cost;
-                if (!cameFrom.ContainsKey(next) || newCost < costSoFar[next])
+                if (!costSoFar.ContainsKey(next) || newCost < costSoFar[next])
                 {
-                    frontier.Enqueue(next, newCost);
-                    costSoFar[next] = newCost + ManhattanHeuristic(next, end);
+                    costSoFar[next] = newCost;                                          
+                    float priority = newCost + ManhattanHeuristic(next, end);         
+                    frontier.Enqueue(next, priority);
                     cameFrom[next] = current;
                 }
             }

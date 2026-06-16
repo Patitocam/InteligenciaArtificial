@@ -18,10 +18,10 @@ public class GrouperController : EntityController
     public override void Start()
     {
         base.Start();
-        enemySm = new EnemySM(Target, playerRb, this, arriveDistance, attackRange, speed, movement, wayPoints);
+        enemySm = new EnemySM(Target, playerRb, this, arriveDistance, attackRange, speed, movement, wayPoints, true);
 
-        seeingNode = new ActionNode(SeeingPlayer);
         notSeeingNode = new ActionNode(NotSeeingPlayer);
+        seeingNode = new ActionNode(SeeingPlayer);
         nearPlayerNode = new ActionNode(InRange);
         attackNode = new ActionNode(Attack);
 
@@ -37,7 +37,7 @@ public class GrouperController : EntityController
 
     void SeeingPlayer()
     {
-        if (enemySm.fsm.CurrentState is ChaseStateEnemy || enemySm.fsm.CurrentState is ThinkingStateEnemy) return;
+        if (enemySm.fsm.CurrentState is FlockingChase || enemySm.fsm.CurrentState is ThinkingStateEnemy) return;
         enemySm.SwitchState(EnemyStatesEnum.Chasing);
         LOS.ModifyLosAngle();
     }

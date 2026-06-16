@@ -49,7 +49,6 @@ public class PfNode : MonoBehaviour
             }
             if (LayerMask.LayerToName(col.gameObject.layer) == "Obstacles")
             {
-                Debug.Log("Obs");
                 neighbors = new List<PfNode>();
                 return false;
             }

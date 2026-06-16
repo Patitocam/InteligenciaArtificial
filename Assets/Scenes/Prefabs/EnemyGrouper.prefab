@@ -325,6 +325,8 @@ MonoBehaviour:
     m_Bits: 64
   speed: 10
   Rb: {fileID: 871619400820985891}
-  arriveDistance: 10
+  arriveDistance: 3
   attackRange: 2
-  wayPoints: []
+  wayPoints:
+  - {fileID: 0}
+  - {fileID: 0}

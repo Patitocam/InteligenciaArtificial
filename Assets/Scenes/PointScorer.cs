@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PointScorer : MonoBehaviour
 {
     [SerializeField] public Dictionary<float, float> pointsAndChances = new Dictionary<float, float>();
     [SerializeField] public float points;
     [SerializeField] private Text text;
+
+    [SerializeField] private List<GameObject> objectives;
 
     RoulletteWheel roulette; 
     void Start()
@@ -22,7 +25,9 @@ public class PointScorer : MonoBehaviour
         if (other.CompareTag("Point"))
         {
             AddPoint(); //Cuando un Amongus azul entra en el corral llama a sumar punto
+            objectives.Remove(other.gameObject);
             Destroy(other.gameObject);
+            if (objectives.Count <= 0) SceneManager.LoadScene("MainMenui");
         }
     }
     void AddPoint()

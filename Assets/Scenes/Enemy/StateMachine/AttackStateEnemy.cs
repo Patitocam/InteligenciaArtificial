@@ -19,11 +19,12 @@ public class AttackStateEnemy : EnemyStates
         Attack();
     }
 
-    // Si el jugador está en un radio de 1.5 unidades alrededor del enemigo, se recarga la escena (simulando que el jugador muere)
+    // Si el jugador está en un radio de 1.5 unidades alrededor del enemigo, se recarga la escena
     private void Attack()
     {
-        Physics.OverlapSphereNonAlloc(owner.transform.position, 1.5f, collisions);
-        foreach (Collider collider in collisions)
+        var coll =Physics.OverlapSphere(owner.transform.position, 1.5f);
+
+        foreach (Collider collider in coll)
         {
             if (collider.CompareTag("Player"))
             {
