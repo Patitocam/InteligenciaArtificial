@@ -10,6 +10,7 @@ public enum EnemyStatesEnum
     Attack,
     Arrive,
     Thinking,
+    Alerted,
 }
 
 public class EnemySM
@@ -17,8 +18,10 @@ public class EnemySM
     public GenericStateMachine<EnemyStatesEnum> fsm;
     public ThinkingStateEnemy ThinkingState { get; private set; }
 
-    // Constructor Chaser: recibe GridGenerator para A* patrol
-    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner, float arriveDistance, float attackRange, float speed, EnemyMovement movement, Transform[] wayPoints, GridGenerator grid)
+    // Constructor Chaser: con A* patrol y sistema de alertas
+    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner,
+        float arriveDistance, float attackRange, float speed,
+        EnemyMovement movement, Transform[] wayPoints, GridGenerator grid)
     {
         fsm = new GenericStateMachine<EnemyStatesEnum>();
 
@@ -32,13 +35,15 @@ public class EnemySM
         fsm.AddState(new AttackStateEnemy(this, fsm, Target, owner), EnemyStatesEnum.Attack);
         fsm.AddState(new ArriveStateEnemy(this, fsm, Target, owner, arriveDistance, attackRange, speed), EnemyStatesEnum.Arrive);
         fsm.AddState(ThinkingState, EnemyStatesEnum.Thinking);
-
+        fsm.AddState(new AlertedState(this, fsm, Vector3.zero, owner, arriveDistance, attackRange, speed, grid), EnemyStatesEnum.Alerted);
         fsm.SetCurrent(idle);
     }
 
-    //Constructor del Grouper
-    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner, float arriveDistance, float attackRange, float speed, EnemyMovement movement, Transform[] wayPoints, bool useFlocking) 
-    { 
+    // Constructor Grouper: con flocking
+    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner,
+        float arriveDistance, float attackRange, float speed,
+        EnemyMovement movement, Transform[] wayPoints, bool useFlocking)
+    {
         fsm = new GenericStateMachine<EnemyStatesEnum>();
 
         var idle = new IdleStateEnemy(this, fsm);
@@ -56,7 +61,8 @@ public class EnemySM
     }
 
     // Constructor Runner: sin patrol ni A*
-    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner, float speed, EnemyMovement movement)
+    public EnemySM(GameObject Target, Rigidbody rb, EntityController owner,
+        float speed, EnemyMovement movement)
     {
         fsm = new GenericStateMachine<EnemyStatesEnum>();
 
@@ -71,7 +77,6 @@ public class EnemySM
     }
 
     public void Tick(float deltaTime) => fsm.Update(deltaTime);
-
     public void SwitchState(EnemyStatesEnum newState) => fsm.ChangeState(newState);
 
     public void SwitchStateWithThinking(EnemyStatesEnum nextState)

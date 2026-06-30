@@ -46,10 +46,8 @@ public class PatrolStateEnemy : EnemyStates
         }
 
         Vector3 originalPos = currentPath[pathIndex].transform.position;
-        Vector3 nextPos = currentPath[Mathf.Clamp(pathIndex + 1, 0, currentPath.Count)].transform.position;
+        Vector3 nextPos = currentPath[Mathf.Clamp(pathIndex + 1, 0, currentPath.Count - 1)].transform.position;
         Vector3 targetPos = Vector3.Lerp(nextPos, originalPos, Mathf.Clamp01((owner.transform.position - originalPos).magnitude));
-
-        // Solo comparamos XZ evita que diferencias mínimas de altura confundan la llegada
         Vector3 ownerXZ = new Vector3(owner.transform.position.x, 0, owner.transform.position.z);
         Vector3 targetXZ = new Vector3(targetPos.x, 0, targetPos.z);
         Vector3 direction = (targetXZ - ownerXZ).normalized;

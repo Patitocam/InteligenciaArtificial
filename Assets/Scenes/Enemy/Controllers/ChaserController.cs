@@ -1,5 +1,4 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ChaserController : EntityController
 {
@@ -16,38 +15,51 @@ public class ChaserController : EntityController
     QuestionNode attackQuestionNode;
     QuestionNode closeQuestionNode;
 
+    private bool wasSeeing = false; 
+
     public override void Start()
     {
         base.Start();
         enemySm = new EnemySM(Target, playerRb, this, arriveDistance, attackRange, speed, movement, wayPoints, grid);
 
-        seeingNode = new ActionNode(SeeingPlayer);
-        notSeeingNode = new ActionNode(NotSeeingPlayer);
+        seeingNode     = new ActionNode(SeeingPlayer);
+        notSeeingNode  = new ActionNode(NotSeeingPlayer);
         nearPlayerNode = new ActionNode(InRange);
-        attackNode = new ActionNode(Attack);
+        attackNode     = new ActionNode(Attack);
 
         attackQuestionNode = new QuestionNode(IsInAttackRange, attackNode, nearPlayerNode);
-        closeQuestionNode = new QuestionNode(IsClose, attackQuestionNode, seeingNode);
-        seeQuestionNode = new QuestionNode(IsSeeing, closeQuestionNode, notSeeingNode);
+        closeQuestionNode  = new QuestionNode(IsClose, attackQuestionNode, seeingNode);
+        seeQuestionNode    = new QuestionNode(IsSeeing, closeQuestionNode, notSeeingNode);
         root = seeQuestionNode;
     }
 
-    private bool IsSeeing() => LOS.Sight();
-    private bool IsClose() => (Target.transform.position - transform.position).magnitude < arriveDistance;
+    private bool IsSeeing()        => LOS.Sight();
+    private bool IsClose()         => (Target.transform.position - transform.position).magnitude < arriveDistance;
     private bool IsInAttackRange() => (Target.transform.position - transform.position).magnitude < attackRange;
 
     void SeeingPlayer()
     {
-        if (enemySm.fsm.CurrentState is ChaseStateEnemy || enemySm.fsm.CurrentState is ThinkingStateEnemy) return;
-        enemySm.SwitchState(EnemyStatesEnum.Chasing);
-        LOS.ModifyLosAngle();
+        if (!wasSeeing)
+        {
+            wasSeeing = true; 
+            AlertedState.AlertAll(Target.transform.position);
+            if (enemySm.fsm.CurrentState is not ChaseStateEnemy)
+                enemySm.SwitchState(EnemyStatesEnum.Chasing);
+        }
     }
+
     void NotSeeingPlayer()
     {
-        if (enemySm.fsm.CurrentState is PatrolStateEnemy || enemySm.fsm.CurrentState is ThinkingStateEnemy) return;
-        LOS.ResetLosAngle(viewAngle);
-        enemySm.SwitchStateWithThinking(EnemyStatesEnum.Patrolling);
+        if (wasSeeing)
+        {
+            wasSeeing = false;
+            LOS.ResetLosAngle(viewAngle);
+            if (enemySm.fsm.CurrentState is not PatrolStateEnemy &&
+                enemySm.fsm.CurrentState is not ThinkingStateEnemy)
+                enemySm.SwitchStateWithThinking(EnemyStatesEnum.Patrolling);
+        }
     }
-    void InRange() { enemySm.SwitchState(EnemyStatesEnum.Arrive); }
-    void Attack() { enemySm.SwitchState(EnemyStatesEnum.Attack); }
+
+    void InRange()  { enemySm.SwitchState(EnemyStatesEnum.Arrive); }
+    void Attack()   { enemySm.SwitchState(EnemyStatesEnum.Attack); }
 }
