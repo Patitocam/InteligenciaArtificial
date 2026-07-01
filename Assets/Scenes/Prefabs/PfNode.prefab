@@ -48,4 +48,8 @@ MonoBehaviour:
   x: 0
   y: 0
   cost: 1
+  viewLenght: 5
+  layer:
+    serializedVersion: 2
+    m_Bits: 192
   reacheable: 1

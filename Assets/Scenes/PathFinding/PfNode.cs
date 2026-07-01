@@ -8,6 +8,9 @@ public class PfNode : MonoBehaviour
     [SerializeField] List<PfNode> neighbors = new();
     [SerializeField] private int x, y;
     [SerializeField] private float cost = 1;
+
+    [SerializeField] private float viewLenght;
+    [SerializeField] private LayerMask layer;
     private Renderer rend;
 
     [SerializeField] private bool reacheable = true;
@@ -18,11 +21,18 @@ public class PfNode : MonoBehaviour
     public int X => x;
     public int Y => y;
 
+    private NodeLOS LOS;
+
+    public List<PfNode> visibleNeighbors = new();
+
     private void Awake()
     {
         rend = GetComponent<Renderer>();
 
         reacheable = Check();
+
+        LOS = new NodeLOS(viewLenght, layer, transform, neighbors);
+        SetVisibleNeighbors();
     }
 
     public void SetIndexes(int x, int y)
@@ -33,6 +43,19 @@ public class PfNode : MonoBehaviour
     public void SetNeighbors(List<PfNode> neighbors)
     {
         this.neighbors = neighbors;
+    }
+
+    public bool HasNextNodeInSight(PfNode target)
+    {
+        return LOS.Sight(target);
+    }
+
+    private void SetVisibleNeighbors()
+    {
+        foreach (PfNode node in neighbors) 
+        { 
+            if (HasNextNodeInSight(node)) visibleNeighbors.Add(node);
+        }
     }
 
     bool Check()

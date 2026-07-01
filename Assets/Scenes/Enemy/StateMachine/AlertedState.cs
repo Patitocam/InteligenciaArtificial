@@ -20,6 +20,7 @@ public class AlertedState : EnemyStates
     public static void AlertAll(Vector3 lastKnownPosition)
     {
         OnPlayerSpotted?.Invoke(lastKnownPosition);
+        Debug.Log("HOLAAAAAAAAAAAAAAAAAAA");
     }
 
     // Ruta A* hacia la última posición conocida
@@ -28,7 +29,7 @@ public class AlertedState : EnemyStates
     private bool hasTarget = false;
 
     // Timer para olvidarse
-    private float forgetTime = 3f;
+    private float forgetTime = 5f;
     private float timer = 0f;
 
     public AlertedState(EnemySM sm, GenericStateMachine<EnemyStatesEnum> stateMachine, Vector3 Target, EntityController owner, float arriveDistance, float attackRange, float speed, GridGenerator grid) : base(stateMachine)
@@ -55,22 +56,25 @@ public class AlertedState : EnemyStates
         target = lastKnownPosition;
         hasTarget = true;
         sm.SwitchState(EnemyStatesEnum.Alerted);
+        Debug.Log("RECIBIIIIII");
     }
 
     public override void Enter()
     {
         timer = 0f;
-        RecalculatePath();
+        OnPlayerSpotted += OnAlerted;
+        Debug.Log("ENTRE");
     }
 
     public override void Tick(float deltaTime)
     {
         base.Tick(deltaTime);
-
         timer += deltaTime;
+
         if (timer >= forgetTime)
         {
             sm.SwitchState(EnemyStatesEnum.Patrolling);
+            timer = 0f;
             return;
         }
 
@@ -89,39 +93,6 @@ public class AlertedState : EnemyStates
 
     private void MoveToTarget()
     {
-        if (currentPath == null || currentPath.Count == 0) return;
-        if (pathIndex >= currentPath.Count) return;
-
-        Vector3 targetPos = currentPath[pathIndex].transform.position;
-        Vector3 ownerXZ  = new Vector3(owner.transform.position.x, 0, owner.transform.position.z);
-        Vector3 targetXZ = new Vector3(targetPos.x, 0, targetPos.z);
-
-        owner.MoveRaw((targetXZ - ownerXZ).normalized, speed);
-
-        if ((targetXZ - ownerXZ).magnitude < 0.4f)
-            pathIndex++;
-    }
-
-    private void RecalculatePath()
-    {
-        if (!hasTarget || grid == null) return;
-        PfNode startNode = GetClosestNode(owner.transform.position);
-        PfNode endNode   = GetClosestNode(target);
-        if (startNode == null || endNode == null) return;
-        currentPath = PathFinding.Astar(startNode, endNode);
-        pathIndex = 0;
-    }
-
-    private PfNode GetClosestNode(Vector3 worldPos)
-    {
-        PfNode closest = null;
-        float minDist = float.MaxValue;
-        foreach (PfNode node in grid.nodeGrid)
-        {
-            if (!node.Reacheable) continue;
-            float dist = Vector3.Distance(worldPos, node.transform.position);
-            if (dist < minDist) { minDist = dist; closest = node; }
-        }
-        return closest;
+        owner.Move(target, speed);
     }
 }

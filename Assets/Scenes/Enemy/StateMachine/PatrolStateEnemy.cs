@@ -45,16 +45,15 @@ public class PatrolStateEnemy : EnemyStates
             return;
         }
 
-        Vector3 originalPos = currentPath[pathIndex].transform.position;
-        Vector3 nextPos = currentPath[Mathf.Clamp(pathIndex + 1, 0, currentPath.Count - 1)].transform.position;
-        Vector3 targetPos = Vector3.Lerp(nextPos, originalPos, Mathf.Clamp01((owner.transform.position - originalPos).magnitude));
+        Vector3 targetPos = currentPath[pathIndex].transform.position;
+       
         Vector3 ownerXZ = new Vector3(owner.transform.position.x, 0, owner.transform.position.z);
         Vector3 targetXZ = new Vector3(targetPos.x, 0, targetPos.z);
         Vector3 direction = (targetXZ - ownerXZ).normalized;
 
-        owner.MoveRaw(direction, speed);
+        owner.Move(direction, speed);
 
-        if ((targetXZ - ownerXZ).magnitude < 0.4f)
+        if ((targetXZ - ownerXZ).magnitude < 1f)
         {
             pathIndex++;
             if (pathIndex >= currentPath.Count)

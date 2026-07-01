@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Unity.PlasticSCM.Editor.WebApi;
 
 public class PathFinding
 {
@@ -26,7 +27,7 @@ public class PathFinding
                     newCurrent = cameFrom[newCurrent];
                 }
                 path.Reverse();
-                return path;
+                return CleanUp(path);
             }
 
             foreach (var next in current.Neighbors)
@@ -49,6 +50,33 @@ public class PathFinding
     private static int ManhattanHeuristic(PfNode a, PfNode b)
     {
         return Mathf.Abs(a.X - b.X) + Mathf.Abs(a.Y - b.Y);
+    }
+
+    private static List<PfNode> CleanUp (List<PfNode> list)
+    {
+        if (list.Count <= 2) return list;
+
+        List<PfNode> result = new();
+
+        int current = 0;
+        result.Add(list[current]);
+
+        while (current < list.Count - 1)
+        {
+            int next = current + 1;
+
+            for (int i =  list.Count- 1; i > current; i--)
+            {
+                if (list[current].HasNextNodeInSight(list[i]))
+                {
+                    next = i;
+                    break;
+                }
+            }
+            result.Add(list[next]);
+            current = next;
+        }
+        return result;
     }
 }
 
